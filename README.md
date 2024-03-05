@@ -70,6 +70,21 @@ e3f6cfd4-b70b-47fb-86f3-5280dfc8abfe services 20 purchases 35
 
 These totals also don't add up (545 and 165 including the pre-2018 appointments compared to 470 and 260), so something else is going on with the query that we'll need to address.
 
+We'll move to the next client in the query results to see if we can narrow down what's happening:
+
+1c202302-5ecb-4675-9737-c4e0ce4b996f services 475 purchases 210 total 685
+
+This client has 3 appointments in our timeframe:
+
+1c202302-5ecb-4675-9737-c4e0ce4b996f services 130 purchases 15
+f54fa9af-1922-4074-8247-8d5fc5b07fb6 services 130 purchases 55
+0f318771-612c-419f-a1ee-88553d5f336c services 85 purchases 0
+
+Again, we're not adding up. Taking another look at the query, it may be because some of the fields from the clients table are included in the group by clause.
+We may need to nest the query in order for data to calculate accurately, then combine with the clients table.
+
+
+
 # Problem Description
 
 *Comb as You Are* have decided to ditch their old salon software provider
