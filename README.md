@@ -19,29 +19,56 @@ This ensures no data is lost as we are moving data.
 The query I wrote is contained in the top_50_loyalty_points.sql file, copied here:
 
 SELECT
-  `phorest-techtest.source_data.clients`.id,
+  client_id,
   first_name,
   last_name,
   email,
-  SUM(`phorest-techtest.source_data.services`.loyalty_points) AS services_loyalty,
-  SUM(`phorest-techtest.source_data.purchases`.loyalty_points) AS purchases_loyalty,
-  SUM(`phorest-techtest.source_data.services`.loyalty_points) + SUM(`phorest-techtest.source_data.purchases`.loyalty_points) AS total_loyalty
+  SUM(IFNULL(`phorest-techtest.source_data.services`.loyalty_points,0)) AS services_loyalty,
+  SUM(IFNULL(`phorest-techtest.source_data.purchases`.loyalty_points,0)) AS purchases_loyalty,
+  SUM(IFNULL(`phorest-techtest.source_data.services`.loyalty_points,0)) + SUM(IFNULL(`phorest-techtest.source_data.purchases`.loyalty_points,0)) AS total_loyalty
 FROM `phorest-techtest.source_data.clients`
-LEFT JOIN `phorest-techtest.source_data.appointments` ON `phorest-techtest.source_data.clients`.id = `phorest-techtest.source_data.appointments`.client_id
+LEFT JOIN `phorest-techtest.source_data.appointments` ON `phorest-techtest.source_data.appointments`.client_id = `phorest-techtest.source_data.clients`.id
 LEFT JOIN `phorest-techtest.source_data.services` ON `phorest-techtest.source_data.appointments`.id = `phorest-techtest.source_data.services`.appointment_id
 LEFT JOIN `phorest-techtest.source_data.purchases` ON `phorest-techtest.source_data.appointments`.id = `phorest-techtest.source_data.purchases`.appointment_id
 WHERE banned = FALSE
 AND start_time >= TIMESTAMP('2018-01-01 00:00:00')
-GROUP BY `phorest-techtest.source_data.clients`.id, last_name, first_name, email, `phorest-techtest.source_data.services`.loyalty_points, `phorest-techtest.source_data.purchases`.loyalty_points
+GROUP BY client_id, last_name, first_name, email
 ORDER BY total_loyalty
-DESC LIMIT 50
+DESC LIMIT 70
 
 The output of this query will provide the client ID, first and last name, email address, loyalty points for services and purchases, and total loyalty points.
 This will provide *Comb as You Are* with everything needed to email their top 50 customers.
+The limit is set to 70 to determine if there are multiple clients with the same loyalty point total as the 50th client.
+This isn't the case, but if it came up we would need to ask our customer if they would like these results included.
 
 The clients table is the main table, joined to the appointments and purchases table.
 Banned customers are being excluded and only appointments from 01-01-2018 are being considered.
 The results are grouped by client ID to avoid issues with similar names, ordered by total loyalty points, and limited to the top 50 results.
+
+# Testing
+
+To verify that data is exporting correctly using the query, I compared the results to the raw files.
+The client with the most loyalty points is client_id: e0779fa6-7635-4df6-b906-d0d665ce5044
+
+The 6 appointments for this client that fall in our timeframe are below.
+I manually added the loyalty point totals for these appointments to ensure the query output matches the raw files.
+
+cc6a6059-ceb9-49a7-a12b-9f264f28f029 services 45 purchases 40
+a6247fa7-d197-4f2c-be94-08c7d9508048 services 110 purchases 20
+463ba6d0-1146-4476-b2f3-45e4d4aaddad services 30 purchases 0
+5617ac4d-9dae-4379-87ec-f3050c179065 services 110 purchases 0
+18e4f32e-5997-494a-9d1b-dfd5984ab02c services 120 purchases 40
+6afa8399-8635-4b6c-9a71-175db7d4f298 services 10 purchases 0
+total services 425 purchases 100
+
+At this point, the loyalty point totals do not match between the query and the raw files. The query has 470 points in services and 260 in purchases.
+
+It's a good thing we tested! The next step is to ensure that the date where clause is functioning properly by adding the other two appointments that occurred before 2018:
+
+e3f6cfd4-b70b-47fb-86f3-5280dfc8abfe services 20 purchases 35
+5f187767-8b2d-4e17-9dab-08b2b5e99b9e services 100 purchases 30
+
+These totals also don't add up (545 and 165 including the pre-2018 appointments compared to 470 and 260), so something else is going on with the query that we'll need to address.
 
 # Problem Description
 
