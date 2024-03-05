@@ -1,3 +1,48 @@
+# My Solution
+
+The scenario outlined below can be solved fairly simply by loading *Comb as You Are's* data into a SQL database and writing a query to extract the 50 clients with the most loyalty points.
+
+I used Google BigQuery as my SQL database and loaded the included .csv files manually.
+In this scenario, we could use several options for file delivery, such as an SFTP server or a tool like Box.com, ensuring that our customer's data is properly secured during delivery.
+
+Before proceeding, I would also compare row counts from the raw files to the tables created in BigQuery:
+
+clients: 100 rows
+appointments: 490 rows
+services: 1031 rows
+purchases: 476 rows
+
+This ensures no data is lost as we are moving data.
+
+# The SQL Query
+
+The query I wrote is contained in the top_50_loyalty_points.sql file, copied here:
+
+SELECT
+  `phorest-techtest.source_data.clients`.id,
+  first_name,
+  last_name,
+  email,
+  SUM(`phorest-techtest.source_data.services`.loyalty_points) AS services_loyalty,
+  SUM(`phorest-techtest.source_data.purchases`.loyalty_points) AS purchases_loyalty,
+  SUM(`phorest-techtest.source_data.services`.loyalty_points) + SUM(`phorest-techtest.source_data.purchases`.loyalty_points) AS total_loyalty
+FROM `phorest-techtest.source_data.clients`
+LEFT JOIN `phorest-techtest.source_data.appointments` ON `phorest-techtest.source_data.clients`.id = `phorest-techtest.source_data.appointments`.client_id
+LEFT JOIN `phorest-techtest.source_data.services` ON `phorest-techtest.source_data.appointments`.id = `phorest-techtest.source_data.services`.appointment_id
+LEFT JOIN `phorest-techtest.source_data.purchases` ON `phorest-techtest.source_data.appointments`.id = `phorest-techtest.source_data.purchases`.appointment_id
+WHERE banned = FALSE
+AND start_time >= TIMESTAMP('2018-01-01 00:00:00')
+GROUP BY `phorest-techtest.source_data.clients`.id, last_name, first_name, email, `phorest-techtest.source_data.services`.loyalty_points, `phorest-techtest.source_data.purchases`.loyalty_points
+ORDER BY total_loyalty
+DESC LIMIT 50
+
+The output of this query will provide the client ID, first and last name, email address, loyalty points for services and purchases, and total loyalty points.
+This will provide *Comb as You Are* with everything needed to email their top 50 customers.
+
+The clients table is the main table, joined to the appointments and purchases table.
+Banned customers are being excluded and only appointments from 01-01-2018 are being considered.
+The results are grouped by client ID to avoid issues with similar names, ordered by total loyalty points, and limited to the top 50 results.
+
 # Problem Description
 
 *Comb as You Are* have decided to ditch their old salon software provider
