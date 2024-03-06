@@ -97,6 +97,27 @@ I'll be looking into my access to ETL tools I've used in previous positions to s
 
 I can access n8n, so will be putting together a sample workflow for automating the process of picking up the data and querying it.
 
+# Automation Update
+
+I created the sample n8n workflow and exported it as a JSON file (phorest_techtest_n8n_workflow.json).
+I also took a screenshot of the workflow for a visual representation (phorest_techtest_n8n_workflow_screenshot.png).
+
+My free trial doesn't include the ability to insert data into BigQuery, so the automation piece isn't fully functioning.
+However, the proof of concept should be visible and I've used similar workflows in previous positions.
+
+The Schedule Trigger node can be used to run the workflow on a schedule of our choosing. It's currently set to run daily at midnight.
+This node can be removed if we have a one-time data transfer. I included it to show that we can grab current data from customers during a migration project to ensure we have up to date information.
+
+I chose Box to store the files, but this node can be updated based on how we expect to receive data from *Comb as You Are*. We can connect to an SFTP server or many other services through n8n.
+
+The first BigQuery node is creating or replacing the 4 tables (appointments, clients, purchases, and services).
+From here, we insert the data from the fresh files into these tables. We can run 4 nodes together, as shown, or write a SQL query to combine the insert of all 4 tables into one node.
+
+Once fresh data has been inserted, we can run our query to find the 50 customers with the most loyalty points.
+
+The results can be shared in a number of ways. I opted to convert them into an Excel file and email the file to our customer through Outlook.
+Other options could be to load the file back into Box.com for customer retrieval, send to a CRM like HubSpot or Salesforce, or export directly into a marketing tool like MailChimp.
+
 # Problem Description
 
 *Comb as You Are* have decided to ditch their old salon software provider
