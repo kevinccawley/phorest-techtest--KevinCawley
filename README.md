@@ -83,7 +83,15 @@ f54fa9af-1922-4074-8247-8d5fc5b07fb6 services 130 purchases 55
 Again, we're not adding up. Taking another look at the query, it may be because some of the fields from the clients table are included in the group by clause.
 We may need to nest the query in order for data to calculate accurately, then combine with the clients table.
 
+# Brief Interlude
 
+It's the next morning, and I'll be working on this as other commitments allow.
+My plans for today include:
+
+1. Breaking the SQL query apart and rebuilding piece by piece
+2. Looking into automating the workflow using an ETL tool like n8n
+
+I'll be looking into my access to ETL tools I've used in previous positions to see if I'm able to put together a workflow.
 
 # Problem Description
 
