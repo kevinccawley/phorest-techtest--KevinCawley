@@ -118,6 +118,8 @@ Once fresh data has been inserted, we can run our query to find the 50 customers
 The results can be shared in a number of ways. I opted to convert them into an Excel file and email the file to our customer through Outlook.
 Other options could be to load the file back into Box.com for customer retrieval, send to a CRM like HubSpot or Salesforce, or export directly into a marketing tool like MailChimp.
 
+With the automation piece demonstrated, I'm returning to the SQL query in an attempt to get data to total accurately.
+
 # Problem Description
 
 *Comb as You Are* have decided to ditch their old salon software provider
