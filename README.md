@@ -93,6 +93,10 @@ My plans for today include:
 
 I'll be looking into my access to ETL tools I've used in previous positions to see if I'm able to put together a workflow.
 
+# Update
+
+I can access n8n, so will be putting together a sample workflow for automating the process of picking up the data and querying it.
+
 # Problem Description
 
 *Comb as You Are* have decided to ditch their old salon software provider
