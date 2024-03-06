@@ -1,0 +1,427 @@
+{
+  "name": "phorest-techtest",
+  "nodes": [
+    {
+      "parameters": {
+        "rule": {
+          "interval": [
+            {}
+          ]
+        }
+      },
+      "id": "7f257167-569b-4515-803d-a705249587b5",
+      "name": "Schedule Trigger - To Automate on Schedule",
+      "type": "n8n-nodes-base.scheduleTrigger",
+      "typeVersion": 1.1,
+      "position": [
+        820,
+        320
+      ]
+    },
+    {
+      "parameters": {
+        "resource": "folder",
+        "operation": "get",
+        "folderId": "252391631784"
+      },
+      "id": "19b39674-1e5a-41d4-9cc8-8d91080c9ce7",
+      "name": "Box - To Pick Up Files Securely",
+      "type": "n8n-nodes-base.box",
+      "typeVersion": 1,
+      "position": [
+        1040,
+        320
+      ],
+      "credentials": {
+        "boxOAuth2Api": {
+          "id": "BNL5NLyiESPaMYhD",
+          "name": "Box account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "projectId": {
+          "__rl": true,
+          "value": "phorest-techtest",
+          "mode": "list",
+          "cachedResultName": "phorest-techtest",
+          "cachedResultUrl": "https://console.cloud.google.com/bigquery?project=phorest-techtest"
+        },
+        "sqlQuery": "CREATE OR REPLACE TABLE phorest-techtest.source_data.appointments\n(\n  id STRING,\n  client_id STRING,\n  start_time TIMESTAMP,\n  end_time TIMESTAMP\n);\nCREATE OR REPLACE TABLE phorest-techtest.source_data.clients\n(\n  id STRING,\n  first_name STRING,\n  last_name STRING,\n  email STRING,\n  phone STRING,\n  gender STRING,\n  banned BOOL\n);\nCREATE OR REPLACE TABLE phorest-techtest.source_data.purchases\n(\n  id STRING,\n  appointment_id STRING,\n  name STRING,\n  price NUMERIC,\n  loyalty_points NUMERIC\n);\nCREATE OR REPLACE TABLE phorest-techtest.source_data.services\n(\n  id STRING,\n  appointment_id STRING,\n  name STRING,\n  price NUMERIC,\n  loyalty_points NUMERIC\n);\n",
+        "options": {}
+      },
+      "id": "5642daab-e2de-4e86-a87c-f2a5ece6fcfd",
+      "name": "Google BigQuery - Create or Replace Tables",
+      "type": "n8n-nodes-base.googleBigQuery",
+      "typeVersion": 2,
+      "position": [
+        1260,
+        320
+      ],
+      "credentials": {
+        "googleBigQueryOAuth2Api": {
+          "id": "LG1wNlKH6uBQWc1S",
+          "name": "Google BigQuery account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "operation": "insert",
+        "projectId": {
+          "__rl": true,
+          "value": "phorest-techtest",
+          "mode": "list",
+          "cachedResultName": "phorest-techtest",
+          "cachedResultUrl": "https://console.cloud.google.com/bigquery?project=phorest-techtest"
+        },
+        "datasetId": {
+          "__rl": true,
+          "value": "source_data",
+          "mode": "list",
+          "cachedResultName": "source_data"
+        },
+        "tableId": {
+          "__rl": true,
+          "value": "appointments",
+          "mode": "id"
+        },
+        "options": {}
+      },
+      "id": "541e8dc2-2a78-473e-9ca7-14c2ee67426e",
+      "name": "Google BigQuery - Appointments Insert",
+      "type": "n8n-nodes-base.googleBigQuery",
+      "typeVersion": 2,
+      "position": [
+        1500,
+        20
+      ],
+      "credentials": {
+        "googleBigQueryOAuth2Api": {
+          "id": "LG1wNlKH6uBQWc1S",
+          "name": "Google BigQuery account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "operation": "insert",
+        "projectId": {
+          "__rl": true,
+          "value": "phorest-techtest",
+          "mode": "list",
+          "cachedResultName": "phorest-techtest",
+          "cachedResultUrl": "https://console.cloud.google.com/bigquery?project=phorest-techtest"
+        },
+        "datasetId": {
+          "__rl": true,
+          "value": "source_data",
+          "mode": "list",
+          "cachedResultName": "source_data"
+        },
+        "tableId": {
+          "__rl": true,
+          "value": "clients",
+          "mode": "list",
+          "cachedResultName": "clients"
+        },
+        "options": {}
+      },
+      "id": "90a2c8df-fa20-4d1b-ad49-01086098cbb0",
+      "name": "Google BigQuery - Clients Insert",
+      "type": "n8n-nodes-base.googleBigQuery",
+      "typeVersion": 2,
+      "position": [
+        1500,
+        220
+      ],
+      "credentials": {
+        "googleBigQueryOAuth2Api": {
+          "id": "LG1wNlKH6uBQWc1S",
+          "name": "Google BigQuery account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "operation": "insert",
+        "projectId": {
+          "__rl": true,
+          "value": "phorest-techtest",
+          "mode": "list",
+          "cachedResultName": "phorest-techtest",
+          "cachedResultUrl": "https://console.cloud.google.com/bigquery?project=phorest-techtest"
+        },
+        "datasetId": {
+          "__rl": true,
+          "value": "source_data",
+          "mode": "list",
+          "cachedResultName": "source_data"
+        },
+        "tableId": {
+          "__rl": true,
+          "value": "purchases",
+          "mode": "list",
+          "cachedResultName": "purchases"
+        },
+        "options": {}
+      },
+      "id": "c644d23d-6d7a-46ed-a382-b59567c4cc72",
+      "name": "Google BigQuery - Purchases Insert",
+      "type": "n8n-nodes-base.googleBigQuery",
+      "typeVersion": 2,
+      "position": [
+        1500,
+        440
+      ],
+      "credentials": {
+        "googleBigQueryOAuth2Api": {
+          "id": "LG1wNlKH6uBQWc1S",
+          "name": "Google BigQuery account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "operation": "insert",
+        "projectId": {
+          "__rl": true,
+          "value": "phorest-techtest",
+          "mode": "list",
+          "cachedResultName": "phorest-techtest",
+          "cachedResultUrl": "https://console.cloud.google.com/bigquery?project=phorest-techtest"
+        },
+        "datasetId": {
+          "__rl": true,
+          "value": "source_data",
+          "mode": "list",
+          "cachedResultName": "source_data"
+        },
+        "tableId": {
+          "__rl": true,
+          "value": "services",
+          "mode": "list",
+          "cachedResultName": "services"
+        },
+        "options": {}
+      },
+      "id": "dfb824a3-6813-47af-9390-521905eddd26",
+      "name": "Google BigQuery - Services Insert",
+      "type": "n8n-nodes-base.googleBigQuery",
+      "typeVersion": 2,
+      "position": [
+        1500,
+        660
+      ],
+      "credentials": {
+        "googleBigQueryOAuth2Api": {
+          "id": "LG1wNlKH6uBQWc1S",
+          "name": "Google BigQuery account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "projectId": {
+          "__rl": true,
+          "value": "phorest-techtest",
+          "mode": "list",
+          "cachedResultName": "phorest-techtest",
+          "cachedResultUrl": "https://console.cloud.google.com/bigquery?project=phorest-techtest"
+        },
+        "sqlQuery": "SELECT \n  client_id, \n  first_name, \n  last_name, \n  email, \n  SUM(IFNULL(phorest-techtest.source_data.services.loyalty_points,0)) AS services_loyalty, \n  SUM(IFNULL(phorest-techtest.source_data.purchases.loyalty_points,0)) AS purchases_loyalty, \n  SUM(IFNULL(phorest-techtest.source_data.services.loyalty_points,0)) + SUM(IFNULL(phorest-techtest.source_data.purchases.loyalty_points,0)) AS total_loyalty\nFROM phorest-techtest.source_data.clients\n  LEFT JOIN phorest-techtest.source_data.appointments ON phorest-techtest.source_data.appointments.client_id = phorest-techtest.source_data.clients.id \n  LEFT JOIN phorest-techtest.source_data.services ON phorest-techtest.source_data.appointments.id = phorest-techtest.source_data.services.appointment_id \n  LEFT JOIN phorest-techtest.source_data.purchases ON phorest-techtest.source_data.appointments.id = phorest-techtest.source_data.purchases.appointment_id \n  WHERE banned = FALSE \n  AND start_time >= TIMESTAMP('2018-01-01 00:00:00') \n  GROUP BY client_id, last_name, first_name, email \n  ORDER BY total_loyalty \n  DESC LIMIT 70",
+        "options": {}
+      },
+      "id": "60648ecf-c4ae-44d2-9a8e-ad25757caab1",
+      "name": "Google BigQuery",
+      "type": "n8n-nodes-base.googleBigQuery",
+      "typeVersion": 2,
+      "position": [
+        1840,
+        320
+      ],
+      "credentials": {
+        "googleBigQueryOAuth2Api": {
+          "id": "LG1wNlKH6uBQWc1S",
+          "name": "Google BigQuery account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "operation": "xlsx",
+        "options": {
+          "fileName": "top_50_loyalty_points",
+          "headerRow": true,
+          "sheetName": "top_50_loyalty_points"
+        }
+      },
+      "id": "805818e4-8542-4da3-9892-8651368d2708",
+      "name": "Convert to File",
+      "type": "n8n-nodes-base.convertToFile",
+      "typeVersion": 1.1,
+      "position": [
+        2060,
+        320
+      ]
+    },
+    {
+      "parameters": {
+        "toRecipients": "combasyouare@combasyouare.biz",
+        "subject": "Top 50 Loyalty Points",
+        "bodyContent": "Hello [NAME],\n\nAttached to this message you will find an attachment containing the list of your top 50 customers, based on total loyalty points for services and purchases.\n\nPlease reply to this message if we can answer any questions or concerns, and thank you for working with Phorest!\n\nSincerely,\n\nKevin Cawley",
+        "additionalFields": {
+          "attachments": {
+            "attachments": [
+              {
+                "binaryPropertyName": "data"
+              }
+            ]
+          }
+        }
+      },
+      "id": "8ba855be-1d43-40f6-9887-925c177bf9b0",
+      "name": "Microsoft Outlook",
+      "type": "n8n-nodes-base.microsoftOutlook",
+      "typeVersion": 2,
+      "position": [
+        2280,
+        320
+      ]
+    }
+  ],
+  "pinData": {},
+  "connections": {
+    "Schedule Trigger - To Automate on Schedule": {
+      "main": [
+        [
+          {
+            "node": "Box - To Pick Up Files Securely",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Box - To Pick Up Files Securely": {
+      "main": [
+        [
+          {
+            "node": "Google BigQuery - Create or Replace Tables",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Google BigQuery - Create or Replace Tables": {
+      "main": [
+        [
+          {
+            "node": "Google BigQuery - Appointments Insert",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "Google BigQuery - Clients Insert",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "Google BigQuery - Purchases Insert",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "Google BigQuery - Services Insert",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Google BigQuery - Appointments Insert": {
+      "main": [
+        [
+          {
+            "node": "Google BigQuery",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Google BigQuery - Clients Insert": {
+      "main": [
+        [
+          {
+            "node": "Google BigQuery",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Google BigQuery - Purchases Insert": {
+      "main": [
+        [
+          {
+            "node": "Google BigQuery",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Google BigQuery - Services Insert": {
+      "main": [
+        [
+          {
+            "node": "Google BigQuery",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Google BigQuery": {
+      "main": [
+        [
+          {
+            "node": "Convert to File",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Convert to File": {
+      "main": [
+        [
+          {
+            "node": "Microsoft Outlook",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Microsoft Outlook": {
+      "main": [
+        []
+      ]
+    }
+  },
+  "active": false,
+  "settings": {
+    "executionOrder": "v1"
+  },
+  "versionId": "55cdcec2-f218-48c0-b867-e64fad08f788",
+  "meta": {
+    "templateCredsSetupCompleted": true,
+    "instanceId": "da1abd64c41eff6b00c5a0ccf11e507098d6144eeebbc4225c9dc23dbc63a42b"
+  },
+  "id": "1YumqhjPsh859iXm",
+  "tags": []
+}
