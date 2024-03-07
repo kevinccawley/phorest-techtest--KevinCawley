@@ -120,6 +120,90 @@ Other options could be to load the file back into Box.com for customer retrieval
 
 With the automation piece demonstrated, I'm returning to the SQL query in an attempt to get data to total accurately.
 
+# SQL Query Revisited
+
+Again, it's the next day, and I'm returning to the SQL query. I'm beginning by breaking the query into sections to determine where the calculation error is occurring.
+
+I can get accurate totals when summing loyalty points on services and products on their own, using queries like:
+
+SELECT
+  appointment_id,
+  SUM(IFNULL(loyalty_points,0)) AS services_loyalty
+FROM `phorest-techtest.source_data.services`
+GROUP BY appointment_id
+ORDER BY services_loyalty
+DESC LIMIT 70
+
+and:
+
+SELECT
+  appointment_id,
+  SUM(IFNULL(loyalty_points,0)) AS purchases_loyalty
+FROM `phorest-techtest.source_data.purchases`
+GROUP BY appointment_id
+ORDER BY purchases_loyalty
+DESC LIMIT 70
+
+But when these are combined, totals again are off, using a query like:
+
+SELECT
+  `phorest-techtest.source_data.services`.appointment_id,
+  SUM(IFNULL(`phorest-techtest.source_data.services`.loyalty_points,0)) AS services_loyalty,
+  SUM(IFNULL(`phorest-techtest.source_data.purchases`.loyalty_points,0)) AS purchases_loyalty,
+  SUM(IFNULL(`phorest-techtest.source_data.services`.loyalty_points,0) + IFNULL(`phorest-techtest.source_data.purchases`.loyalty_points,0)) AS total_loyalty
+FROM `phorest-techtest.source_data.services`
+LEFT JOIN `phorest-techtest.source_data.purchases` ON `phorest-techtest.source_data.services`.appointment_id = `phorest-techtest.source_data.purchases`.appointment_id
+GROUP BY appointment_id
+ORDER BY total_loyalty
+DESC LIMIT 70
+
+In order to solve this issue, we'll break the components down using WITH statements. The first attempt at the query looks like this:
+
+WITH services AS 
+  (SELECT
+  appointment_id,
+  SUM(IFNULL(loyalty_points,0)) AS services_loyalty
+  FROM `phorest-techtest.source_data.services`
+  GROUP BY appointment_id
+  ORDER BY services_loyalty),
+  purchases AS
+  (SELECT
+  appointment_id,
+  SUM(IFNULL(loyalty_points,0)) AS purchases_loyalty
+  FROM `phorest-techtest.source_data.purchases`
+  GROUP BY appointment_id
+  ORDER BY purchases_loyalty)
+SELECT
+  client_id,
+  first_name,
+  last_name,
+  email,
+  services.services_loyalty,
+  purchases.purchases_loyalty,
+  (services.services_loyalty + purchases.purchases_loyalty) AS total_loyalty
+FROM
+  `phorest-techtest.source_data.appointments`
+LEFT JOIN `phorest-techtest.source_data.clients` ON `phorest-techtest.source_data.appointments`.client_id = `phorest-techtest.source_data.clients`.id
+LEFT JOIN services ON `phorest-techtest.source_data.appointments`.id = services.appointment_id
+LEFT JOIN purchases ON `phorest-techtest.source_data.appointments`.id = purchases.appointment_id
+WHERE banned = FALSE
+AND start_time >= TIMESTAMP('2018-01-01 00:00:00')
+GROUP BY client_id, last_name, first_name, email, services.services_loyalty, purchases.purchases_loyalty
+ORDER BY total_loyalty
+DESC LIMIT 70
+
+Our top client using this query has client_id:
+
+5874a4fc-d96c-426f-8ae8-c7dfa5b60c3e
+
+with 200 services loyalty and 55 purchases loyalty. To verify, we'll return to the raw data, where we see 3 appointments that fall in our timeframe:
+
+81d17e64-b797-431d-a81c-88da3956d05f services 200 purchases 55
+4cda1739-fc09-498d-a665-5abc83d5dc9f services 20 purchases 0
+778ea773-5c57-43c4-873a-226934b1f0a3 services 70 purchases 10
+
+The totals from the first appointment match, but the other appointments are not being factored in. We'll look at our joins next.
+
 # Problem Description
 
 *Comb as You Are* have decided to ditch their old salon software provider
