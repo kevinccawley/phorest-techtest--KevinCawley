@@ -206,6 +206,84 @@ The totals from the first appointment match, but the other appointments are not 
 
 We need to figure out a better way to phrase the query so the joins don't interfere with the aggregate functions (SUM).
 
+# Next SQL Query Iteration
+
+Moving the point totals into the from statement instead of using a WITH statement to see if this helps with inaccurate calculations:
+
+SELECT 
+    c.id, 
+    c.email,
+    c.first_name,
+    c.last_name,
+    COALESCE(s.services_loyalty_points, 0) AS services_loyalty_points,
+    COALESCE(p.purchases_loyalty_points, 0) AS purchases_loyalty_points,
+    COALESCE(s.services_loyalty_points, 0) + COALESCE(p.purchases_loyalty_points, 0) AS total_loyalty_points
+FROM 
+    `phorest-techtest.source_data.clients` c
+LEFT JOIN (
+    SELECT 
+        a.client_id,
+        SUM(s.loyalty_points) AS services_loyalty_points
+    FROM 
+        `phorest-techtest.source_data.appointments` a
+    JOIN 
+        `phorest-techtest.source_data.services` s 
+        ON a.id = s.appointment_id
+    WHERE 
+        a.start_time >= TIMESTAMP('2018-01-01 00:00:00')
+    GROUP BY 
+        a.client_id
+) s ON c.id = s.client_id
+LEFT JOIN (
+    SELECT 
+        a.client_id,
+        SUM(p.loyalty_points) AS purchases_loyalty_points
+    FROM 
+        `phorest-techtest.source_data.appointments` a
+    LEFT JOIN 
+        `phorest-techtest.source_data.purchases` p 
+        ON a.id = p.appointment_id
+    WHERE 
+        a.start_time >= TIMESTAMP('2018-01-01 00:00:00')
+    GROUP BY 
+        a.client_id
+) p ON c.id = p.client_id
+WHERE 
+    c.banned = FALSE
+ORDER BY 
+    total_loyalty_points DESC
+LIMIT 70;
+
+We have the same top customer as previous iterations:
+
+e0779fa6-7635-4df6-b906-d0d665ce5044 services 425 purchases 100 total 525
+
+And we again verify using the source data, finding these appointments in our timeframe:
+
+cc6a6059-ceb9-49a7-a12b-9f264f28f029 services 45 purchases 40
+a6247fa7-d197-4f2c-be94-08c7d9508048 services 110 purchases 20
+463ba6d0-1146-4476-b2f3-45e4d4aaddad services 30 purchases 0
+5617ac4d-9dae-4379-87ec-f3050c179065 services 110 purchases 0
+18e4f32e-5997-494a-9d1b-dfd5984ab02c services 120 purchases 40
+6afa8399-8635-4b6c-9a71-175db7d4f298 services 10 purchases 0
+total: services 425 purchases 100
+
+Success!
+
+# Further Testing
+
+With more time and fully-functioning tooling, we would test the ETL workflow and tweak as necessary.
+I'd also manually compare point totals for more clients to ensure the query works in all situations.
+
+The clients with the 48th, 49th, and 50th highest loyalty point totals all have 125 points. The client in 51st place has 120 points, so we won't need to address a tie.
+The final version of the SQL query (contained in the top_50_loyalty_points.sql file) replaces the limit of 70 with a limit of 50 because of this.
+
+Before loading this data into *Phorest*, we may also want to look at data formatting. The email addresses appear okay, but the phone numbers have a variety of formats.
+We can use regular expressions to ensure we're loading data in the same format for phone numbers and that email addresses are valid:
+
+REGEXP_REPLACE(phone_number, '[^0-9]', '')
+REGEXP_LIKE(email, '^[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\.[A-Za-z]{2,}$')
+
 # Problem Description
 
 *Comb as You Are* have decided to ditch their old salon software provider
