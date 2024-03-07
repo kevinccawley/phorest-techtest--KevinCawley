@@ -1,3 +1,12 @@
+# Introduction
+
+First off, I'd like to apologize for not having this to you sooner. This week became busier than anticipated due to unexpected appointments combined with prior commitments.
+Next, as you may be able to tell, I am not a regular github user. I apologize if my commit history is hard to follow. I did include as much of my thought process in this document as possible.
+
+Finally, I'd be happy to walk through anything included below on a Google Meet or Zoom call if more information is necessary.
+
+Thank you for your time and for providing a challenge!
+
 # My Solution
 
 The scenario outlined below can be solved fairly simply by loading *Comb as You Are's* data into a SQL database and writing a query to extract the 50 clients with the most loyalty points.
@@ -208,7 +217,7 @@ We need to figure out a better way to phrase the query so the joins don't interf
 
 # Next SQL Query Iteration
 
-Moving the point totals into the from statement instead of using a WITH statement to see if this helps with inaccurate calculations:
+Moving the point totals into the from statement instead of using a WITH statement to see if this helps with inaccurate calculations, and using COALESCE instead of IFNULL:
 
 SELECT 
     c.id, 
@@ -283,6 +292,8 @@ We can use regular expressions to ensure we're loading data in the same format f
 
 REGEXP_REPLACE(phone_number, '[^0-9]', '')
 REGEXP_LIKE(email, '^[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\.[A-Za-z]{2,}$')
+
+# Original Problem Below #
 
 # Problem Description
 
