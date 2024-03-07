@@ -202,7 +202,9 @@ with 200 services loyalty and 55 purchases loyalty. To verify, we'll return to t
 4cda1739-fc09-498d-a665-5abc83d5dc9f services 20 purchases 0
 778ea773-5c57-43c4-873a-226934b1f0a3 services 70 purchases 10
 
-The totals from the first appointment match, but the other appointments are not being factored in. We'll look at our joins next.
+The totals from the first appointment match, but the other appointments are not being factored in.
+
+We need to figure out a better way to phrase the query so the joins don't interfere with the aggregate functions (SUM).
 
 # Problem Description
 
